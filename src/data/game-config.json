@@ -1,0 +1,833 @@
+{
+  "meta": {
+    "title": "IMPURO",
+    "subtitle": "Ruta insurgente de la Independencia",
+    "introTitle": "Novela grafica historica de decisiones",
+    "introBody": "Recorre la ruta que conecta a Miguel Hidalgo, Ignacio Allende y Jose Maria Morelos. Cada escena te da contexto historico, un vinculo entre personajes y una decision que define cuanto comprendes del proceso independentista.",
+    "learningGoal": "Objetivo: entender como se encadenaron la conspiracion de Queretaro, el Grito de Dolores, la etapa militar inicial y la construccion politica del proyecto insurgente.",
+    "startLabel": "Jugar",
+    "continueLabel": "Continuar la ruta",
+    "finishLabel": "Ver mi veredicto",
+    "restartLabel": "Volver a jugar",
+    "journalTitle": "Bitacora insurgente",
+    "archiveTitle": "Archivo historico",
+    "storyLabel": "Relato",
+    "historyButtonLabel": "Ver historia",
+    "questionLabel": "Decision",
+    "referenceLabel": "Archivo",
+    "resultLabel": "Resultado",
+    "answersLabel": "Respuestas",
+    "timelineLabel": "Orden historico"
+  },
+  "theme": {
+    "fontFamily": "'Cinzel', 'Palatino Linotype', serif",
+    "colors": {
+      "ink": "#f7ead3",
+      "paper": "#1a120f",
+      "paperSoft": "rgba(35, 24, 19, 0.86)",
+      "line": "rgba(248, 225, 186, 0.24)",
+      "gold": "#c79c5c",
+      "danger": "#b6483a",
+      "success": "#3f8a61",
+      "warning": "#d39c41",
+      "shadow": "rgba(0, 0, 0, 0.48)"
+    }
+  },
+  "gameplay": {
+    "pointsPerCorrect": 10,
+    "journalLimit": 8
+  },
+  "sounds": {
+    "enabled": false,
+    "basePath": "src/audio",
+    "volume": 1.0,
+    "musicVolume": 1.0,
+    "background": {
+      "menu": "menu_theme.mp3",
+      "ending": "end_game_complete.mp3"
+    },
+    "events": {
+      "ui.start": { "file": "ui_button_start.wav" },
+      "ui.menu.open": { "file": "modal_open.wav" },
+      "ui.menu.close": { "file": "modal_close.wav" },
+      "ui.story.open": { "file": "story_open.wav" },
+      "ui.story.close": { "file": "story_close.wav" },
+      "ui.page.turn": { "file": "scene_page_turn.wav" },
+      "ui.choice.correct": { "file": "action_success.wav" },
+      "ui.choice.incorrect": { "file": "action_fail.wav" },
+      "scene.advance": { "file": "scene_page_turn.wav" },
+      "ending.reveal": { "file": "ending_reveal.wav" }
+    }
+  },
+  "characterProfiles": [
+    {
+      "id": "hidalgo",
+      "name": "Miguel Hidalgo y Costilla",
+      "role": "Sacerdote y dirigente del inicio insurgente",
+      "summary": "Hidalgo transformo la conspiracion en una movilizacion popular abierta. Su figura conecta el reclamo local con el arranque de la guerra de Independencia.",
+      "highlights": [
+        "Encabezo el llamado del 16 de septiembre de 1810.",
+        "Convirtio una red clandestina en un levantamiento publico.",
+        "Su liderazgo simboliza el inicio de la insurgencia."
+      ],
+      "wikiUrl": "https://es.wikipedia.org/wiki/Miguel_Hidalgo_y_Costilla"
+    },
+    {
+      "id": "allende",
+      "name": "Ignacio Allende",
+      "role": "Capitan insurgente y estratega militar",
+      "summary": "Allende aporto disciplina militar y organizacion al movimiento. Su relacion con Hidalgo muestra como el inicio insurgente combino carisma politico y planeacion castrense.",
+      "highlights": [
+        "Participo en la conspiracion de Queretaro.",
+        "Tuvo un papel central en la organizacion militar insurgente.",
+        "Sus desacuerdos con Hidalgo marcaron la primera etapa de la guerra."
+      ],
+      "wikiUrl": "https://es.wikipedia.org/wiki/Ignacio_Allende"
+    },
+    {
+      "id": "morelos",
+      "name": "Jose Maria Morelos y Pavon",
+      "role": "Conductor militar y politico del sur",
+      "summary": "Morelos recibio de Hidalgo la mision de extender la insurgencia al sur y despues le dio mayor forma politica mediante el Congreso de Chilpancingo y Sentimientos de la Nacion.",
+      "highlights": [
+        "Organizo el frente sur con mayor disciplina.",
+        "Resistio en Cuautla y mantuvo viva la insurgencia.",
+        "Impulso el Congreso de Chilpancingo y Sentimientos de la Nacion."
+      ],
+      "wikiUrl": "https://es.wikipedia.org/wiki/Jos%C3%A9_Mar%C3%ADa_Morelos"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "queretaro_alerta",
+      "characterId": "allende",
+      "sequenceLabel": "Acto I",
+      "year": "Septiembre de 1810",
+      "location": "Queretaro",
+      "accent": "#c98a52",
+      "background": "src/img/independencia4.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Conspiraci%C3%B3n_de_Quer%C3%A9taro",
+      "theme": "scene_1_allende.mp3",
+      "character": {
+        "name": "Ignacio Allende",
+        "role": "Capitan insurgente y organizador militar",
+        "image": "src/img/ignacio-allende.png"
+      },
+      "eventTitle": "La conspiracion queda al descubierto",
+      "narration": [
+        "Las reuniones de Queretaro buscaban coordinar un levantamiento criollo contra el gobierno virreinal.",
+        "Cuando la conspiracion fue denunciada, Allende comprendio que el movimiento ya no podia seguir en secreto."
+      ],
+      "historicalContext": "Las autoridades empezaron a vigilar a los participantes del complot. Si los insurgentes esperaban mas tiempo, podian ser arrestados antes de movilizar al pueblo.",
+      "characterLink": "Allende aportaba organizacion militar; Hidalgo podia convertir la conspiracion en una convocatoria popular. El aviso que salio de Queretaro fue el puente entre ambos liderazgos.",
+      "question": {
+        "prompt": "Si formas parte del consejo insurgente, cual interpretacion resume mejor la urgencia del momento?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Debian adelantar el levantamiento porque la conspiracion ya habia sido descubierta por las autoridades virreinales.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Lectura historica correcta",
+            "message": "La insurreccion se precipito para evitar la captura de los conspiradores y aprovechar el aviso que llego desde Queretaro.",
+            "historicalNote": "La tradicion historica atribuye a Josefa Ortiz de Dominguez un aviso decisivo que permitio contactar a Hidalgo y Allende antes de una represion general.",
+            "journalEntry": "El movimiento insurgente se adelanto cuando la conspiracion de Queretaro fue descubierta."
+          },
+          {
+            "label": "Debian esperar a que Espana nombrara un nuevo virrey para negociar mejores impuestos.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "La coyuntura era mas grave",
+            "message": "No se trataba de una negociacion fiscal. La prioridad era impedir arrestos y activar la rebelion antes de perder la iniciativa.",
+            "historicalNote": "La crisis de 1810 estaba ligada a la legitimidad del poder en la Nueva Espana, no a una simple reforma administrativa.",
+            "journalEntry": "La conspiracion no buscaba negociar impuestos: buscaba iniciar un levantamiento antes de la represion."
+          },
+          {
+            "label": "Debian suspender todo porque el movimiento dependia solo de una autorizacion oficial de la Corona.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "Sin permiso de la Corona",
+            "message": "La insurgencia rompio precisamente con la obediencia a la autoridad virreinal. Esperar autorizacion habria desarticulado el movimiento.",
+            "historicalNote": "Los conspiradores pasaron de la reserva politica a la accion cuando vieron inminente su captura.",
+            "journalEntry": "La insurgencia nacio como una respuesta clandestina y urgente, no como un proyecto autorizado por la monarquia."
+          }
+        ]
+      }
+    },
+    {
+      "id": "grito_dolores",
+      "characterId": "hidalgo",
+      "sequenceLabel": "Acto II",
+      "year": "16 de septiembre de 1810",
+      "location": "Dolores",
+      "accent": "#a7493d",
+      "background": "src/img/independencia5.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Grito_de_Dolores",
+      "theme": "scene_2_hidalgo.mp3",
+      "character": {
+        "name": "Miguel Hidalgo y Costilla",
+        "role": "Sacerdote y dirigente del inicio insurgente",
+        "image": "src/img/miguel-hidalgo.png"
+      },
+      "eventTitle": "El Grito de Dolores convierte la conspiracion en rebelion",
+      "narration": [
+        "Hidalgo tomo la decision de convocar al pueblo en plena madrugada.",
+        "Lo que antes era una red de conspiradores se transformo en una movilizacion abierta contra el mal gobierno."
+      ],
+      "historicalContext": "El llamado de Dolores no fue una declaracion constitucional detallada, sino una convocatoria politica y emocional para levantarse contra la autoridad virreinal.",
+      "characterLink": "Allende y otros conspiradores necesitaban una figura que conectara con la poblacion. Hidalgo aporto esa legitimidad social y convirtio la urgencia militar en un movimiento popular.",
+      "question": {
+        "prompt": "Que accion define mejor el significado historico del Grito de Dolores?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Hidalgo convoco a la poblacion a levantarse contra el mal gobierno y a iniciar la lucha insurgente.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "La rebelion se hizo publica",
+            "message": "El Grito de Dolores se recuerda como la llamada que puso en marcha la guerra de Independencia en su fase abierta.",
+            "historicalNote": "Su fuerza historica esta en la movilizacion popular y en la ruptura con la pasividad ante el poder virreinal.",
+            "journalEntry": "El Grito de Dolores transformo una conspiracion en un levantamiento publico."
+          },
+          {
+            "label": "Hidalgo promulgo de inmediato una constitucion nacional completa y eligio un congreso permanente.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Aun no existia ese proyecto formal",
+            "message": "En 1810 el movimiento apenas comenzaba. La formulacion politica mas estructurada llegaria despues con Morelos y el Congreso de Chilpancingo.",
+            "historicalNote": "La etapa de Hidalgo fue mas movilizadora que institucional.",
+            "journalEntry": "La primera fase insurgente fue de convocatoria y combate, no de construccion constitucional completa."
+          },
+          {
+            "label": "Hidalgo anuncio la independencia ya consumada y el fin inmediato de la guerra.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "La guerra apenas iniciaba",
+            "message": "El llamado de Dolores marco el comienzo de la lucha, no su desenlace. Aun faltaban años de campanas, derrotas y reorganizacion insurgente.",
+            "historicalNote": "La independencia se consumaria hasta 1821, mas de una decada despues del Grito.",
+            "journalEntry": "El Grito de Dolores fue el arranque del conflicto, no su resultado final."
+          }
+        ]
+      }
+    },
+    {
+      "id": "guanajuato",
+      "characterId": "allende",
+      "sequenceLabel": "Acto III",
+      "year": "Septiembre de 1810",
+      "location": "Guanajuato",
+      "accent": "#b9784c",
+      "background": "src/img/independencia4.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Alh%C3%B3ndiga_de_Granaditas",
+      "theme": "scene_3_allende.mp3",
+      "character": {
+        "name": "Ignacio Allende",
+        "role": "Jefe militar de la primera ofensiva insurgente",
+        "image": "src/img/ignacio-allende.png"
+      },
+      "eventTitle": "La toma de la Alhondiga de Granaditas",
+      "narration": [
+        "La entrada insurgente a Guanajuato fue un golpe simbolico y militar para la autoridad colonial.",
+        "El crecimiento del ejercito popular tambien mostro tensiones entre entusiasmo masivo y disciplina castrense."
+      ],
+      "historicalContext": "La Alhondiga era un punto de refugio y defensa para espanoles y autoridades locales. Su caida mostro la fuerza del movimiento, pero tambien la dificultad de controlar a un ejercito improvisado.",
+      "characterLink": "Allende queria un avance mas ordenado y militarizado; Hidalgo encabezaba a una masa popular mucho mas heterogenea. Esa diferencia marcaria sus desacuerdos estrategicos posteriores.",
+      "question": {
+        "prompt": "Por que Guanajuato resulto una plaza clave en la primera fase de la insurgencia?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Porque concentraba recursos, poder local y un fuerte valor simbolico para demostrar que el levantamiento podia derrotar posiciones virreinales.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Dimension militar y simbolica",
+            "message": "La toma de Guanajuato mostro que la rebelion podia desafiar espacios urbanos controlados por la autoridad colonial.",
+            "historicalNote": "La Alhondiga de Granaditas quedo en la memoria insurgente como un episodio decisivo de expansion y radicalizacion.",
+            "journalEntry": "Guanajuato fue clave por sus recursos y por demostrar la capacidad ofensiva del movimiento insurgente."
+          },
+          {
+            "label": "Porque alli ya sesionaba el Congreso de Chilpancingo y la constitucion insurgente estaba vigente.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Ese momento llego despues",
+            "message": "El Congreso de Chilpancingo pertenece a 1813 y esta asociado a Morelos, no a la ofensiva inicial de 1810.",
+            "historicalNote": "La insurgencia paso primero por una fase de movilizacion militar antes de construir organos politicos formales.",
+            "journalEntry": "La toma de Guanajuato fue una victoria temprana; el congreso insurgente vendria años despues."
+          },
+          {
+            "label": "Porque Guanajuato era la sede del principal puerto del Pacifico y controlaba el comercio con Asia.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "Confusion geografica",
+            "message": "El puerto estrategico del sur era Acapulco. Guanajuato destacaba por su peso economico minero y por sus posiciones urbanas, no por ser puerto.",
+            "historicalNote": "Ese objetivo maritimo aparecera mas adelante en la mision confiada a Morelos.",
+            "journalEntry": "Guanajuato fue importante por su riqueza y por la Alhondiga, no por un puerto del Pacifico."
+          }
+        ]
+      }
+    },
+    {
+      "id": "monte_cruces",
+      "characterId": "hidalgo",
+      "sequenceLabel": "Acto IV",
+      "year": "Octubre de 1810",
+      "location": "Monte de las Cruces",
+      "accent": "#8f503f",
+      "background": "src/img/independencia5.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Batalla_del_Monte_de_las_Cruces",
+      "theme": "scene_4_hidalgo.mp3",
+      "character": {
+        "name": "Miguel Hidalgo y Costilla",
+        "role": "Conductor politico del movimiento inicial",
+        "image": "src/img/miguel-hidalgo.png"
+      },
+      "eventTitle": "La oportunidad perdida hacia la capital",
+      "narration": [
+        "Tras la victoria insurgente en Monte de las Cruces, el camino hacia la Ciudad de Mexico parecia abierto.",
+        "Sin embargo, la retirada revelo diferencias de criterio entre quienes priorizaban el impulso politico y quienes pensaban en la maniobra militar."
+      ],
+      "historicalContext": "La decision de no ocupar la capital sigue siendo uno de los episodios mas discutidos de la guerra. El ejercito insurgente era numeroso, pero desigual, y su capacidad de sostener una ocupacion era incierta.",
+      "characterLink": "Allende consideraba que debia aprovecharse la ventaja militar. Hidalgo fue mas cauteloso ante el costo humano, la disciplina irregular y la posible resistencia en la capital.",
+      "question": {
+        "prompt": "Cual fue el desacuerdo estrategico que hizo visible la relacion entre Hidalgo y Allende despues de Monte de las Cruces?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Discutieron si debian avanzar de inmediato sobre la Ciudad de Mexico o retirarse para reorganizar al ejercito insurgente.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "La tension central fue estrategica",
+            "message": "La diferencia entre tomar la capital o replegarse expuso dos modos de entender el mando insurgente.",
+            "historicalNote": "La retirada posterior debilito el impulso del movimiento y alimento desacuerdos internos entre sus jefes.",
+            "journalEntry": "Monte de las Cruces revelo el choque entre el impulso militar de Allende y la cautela politica de Hidalgo."
+          },
+          {
+            "label": "Discutieron si era mejor apoyar a Morelos en Chilpancingo, aunque Morelos aun no habia recibido su mision.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "La cronologia no coincide",
+            "message": "Morelos todavia no encabezaba el proyecto politico del sur. Ese desarrollo vendria despues de su encuentro con Hidalgo.",
+            "historicalNote": "El episodio de Monte de las Cruces pertenece a la etapa temprana del movimiento, cuando la direccion seguia concentrada en Hidalgo y Allende.",
+            "journalEntry": "El gran desacuerdo de 1810 no giraba aun en torno a Morelos, sino al rumbo militar de Hidalgo y Allende."
+          },
+          {
+            "label": "Discutieron la firma de los Tratados de Cordoba, que ya habian reconocido la independencia.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "Hecho de otra etapa historica",
+            "message": "Los Tratados de Cordoba son de 1821. En 1810 la insurgencia estaba lejos de lograr un reconocimiento de ese tipo.",
+            "historicalNote": "Confundir etapas borra como evoluciono la guerra desde el levantamiento inicial hasta su consumacion.",
+            "journalEntry": "En 1810 la discusion era sobre como sostener la ofensiva, no sobre tratados de consumacion."
+          }
+        ]
+      }
+    },
+    {
+      "id": "encuentro_morelos",
+      "characterId": "morelos",
+      "sequenceLabel": "Acto V",
+      "year": "Octubre de 1810",
+      "location": "Charo e Indaparapeo",
+      "accent": "#8d724f",
+      "background": "src/img/independencia.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Jos%C3%A9_Mar%C3%ADa_Morelos",
+      "theme": "scene_5_morelos.mp3",
+      "character": {
+        "name": "Jose Maria Morelos y Pavon",
+        "role": "Aliado de Hidalgo y futuro conductor del sur",
+        "image": "src/img/jose-maria-morelos.png"
+      },
+      "eventTitle": "Hidalgo entrega a Morelos una mision insurgente",
+      "narration": [
+        "Morelos encontro a Hidalgo cuando la rebelion ya se habia extendido por el centro del virreinato.",
+        "Ese encuentro transformo a un sacerdote de provincia en un dirigente militar y politico del sur novohispano."
+      ],
+      "historicalContext": "Hidalgo comisiono a Morelos para levantar tropas en el sur y avanzar hacia Acapulco. Con ello la insurgencia dejo de depender de un solo frente y comenzo a diversificarse territorialmente.",
+      "characterLink": "La relacion entre Hidalgo y Morelos fue de continuidad: el primero encendio la rebelion, el segundo la reorganizo y la llevo hacia una formulacion politica mas consistente.",
+      "question": {
+        "prompt": "Que mision historica recibio Morelos cuando se encontro con Hidalgo?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Organizar la insurgencia en el sur y buscar la toma de Acapulco como punto estrategico.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Mision del sur identificada",
+            "message": "Morelos recibio una encomienda concreta: abrir un frente sureno que ampliara el radio de la rebelion.",
+            "historicalNote": "La campana del sur le permitio a Morelos desarrollar un mando mas disciplinado que el de la etapa inicial.",
+            "journalEntry": "Hidalgo encargo a Morelos extender la insurgencia por el sur y dirigirse hacia Acapulco."
+          },
+          {
+            "label": "Presidir de inmediato el Congreso de Chilpancingo y redactar una constitucion nacional ese mismo ano.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Eso llegaria despues",
+            "message": "El proyecto congresional se consolidaria en 1813. En 1810 la prioridad era militar y territorial.",
+            "historicalNote": "La trayectoria de Morelos fue primero militar y luego claramente politica.",
+            "journalEntry": "Morelos inicio como jefe militar del sur; su liderazgo congresional surgio despues."
+          },
+          {
+            "label": "Negociar con el virrey un indulto general para terminar la guerra sin campanas militares.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "La mision era combatir, no pactar el final",
+            "message": "La encomienda insurgente consistia en reclutar, organizar y abrir un nuevo frente, no en desmovilizar el movimiento.",
+            "historicalNote": "El sur se volvio crucial precisamente porque Morelos sostuvo la lucha con continuidad y organizacion.",
+            "journalEntry": "La tarea de Morelos fue expandir la guerra insurgente, no cerrarla mediante un indulto."
+          }
+        ]
+      }
+    },
+    {
+      "id": "puente_calderon",
+      "characterId": "allende",
+      "sequenceLabel": "Acto VI",
+      "year": "Enero de 1811",
+      "location": "Puente de Calderon",
+      "accent": "#b05344",
+      "background": "src/img/independencia4.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Batalla_del_Puente_de_Calder%C3%B3n",
+      "theme": "scene_6_allende.mp3",
+      "character": {
+        "name": "Ignacio Allende",
+        "role": "Militar profesional dentro del mando insurgente",
+        "image": "src/img/ignacio-allende.png"
+      },
+      "eventTitle": "La derrota que reconfigura el mando",
+      "narration": [
+        "El ejercito insurgente parecia numeroso, pero seguia teniendo problemas de disciplina, armamento y coordinacion.",
+        "En Puente de Calderon, una accion decisiva volteo el curso de la batalla y forzo la retirada."
+      ],
+      "historicalContext": "La victoria realista consolidada por Felix Maria Calleja fracturo el impulso inicial de la rebelion. Tras la derrota, Allende gano peso en la conduccion militar frente a Hidalgo.",
+      "characterLink": "La crisis de 1811 profundizo los contrastes entre el liderazgo carismatico de Hidalgo y la obsesion de Allende por la disciplina militar.",
+      "question": {
+        "prompt": "Que hecho concreto suele identificarse como el giro decisivo en la derrota insurgente de Puente de Calderon?",
+        "points": 10,
+        "options": [
+          {
+            "label": "El impacto realista sobre el parque insurgente, que desordeno al ejercito y desato el caos en la batalla.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Momento clave reconocido",
+            "message": "La explosion o incendio del parque insurgente desorganizo la linea rebelde y permitio la ventaja definitiva de las fuerzas realistas.",
+            "historicalNote": "Puente de Calderon mostro que el numero de combatientes no compensaba la falta de disciplina y artilleria estable.",
+            "journalEntry": "En Puente de Calderon, el dano sobre el parque insurgente precipito la derrota y la retirada."
+          },
+          {
+            "label": "La captura inmediata de Morelos en el campo de batalla, que dejo al sur sin mando.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Morelos no estuvo alli",
+            "message": "Morelos operaba en otro frente. La derrota de Calderon afecto sobre todo al mando encabezado por Hidalgo y Allende.",
+            "historicalNote": "La dispersion territorial de la insurgencia permitio que el frente del sur continuara aun cuando el nucleo inicial sufrio golpes severos.",
+            "journalEntry": "Puente de Calderon fue un golpe para Hidalgo y Allende; Morelos sostenia otro frente insurgente."
+          },
+          {
+            "label": "La firma de una alianza naval con Inglaterra que fracaso al llegar tarde.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "No hubo tal alianza en la batalla",
+            "message": "La derrota se explica por factores internos del combate, especialmente armamento, disciplina y un golpe directo al parque insurgente.",
+            "historicalNote": "Las limitaciones logisticas del ejercito rebelde fueron decisivas en esta etapa.",
+            "journalEntry": "La derrota insurgente en Calderon respondio a su debilidad militar, no a una alianza naval fallida."
+          }
+        ]
+      }
+    },
+    {
+      "id": "captura_norte",
+      "characterId": "hidalgo",
+      "sequenceLabel": "Acto VII",
+      "year": "Marzo de 1811",
+      "location": "Acatita de Bajan",
+      "accent": "#8d4e3f",
+      "background": "src/img/independencia5.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Acatita_de_Baj%C3%A1n",
+      "theme": "scene_7_hidalgo.mp3",
+      "character": {
+        "name": "Miguel Hidalgo y Costilla",
+        "role": "Lider del levantamiento inicial en retirada",
+        "image": "src/img/miguel-hidalgo.png"
+      },
+      "eventTitle": "La captura de los primeros caudillos",
+      "narration": [
+        "Despues de las derrotas, los dirigentes insurgentes buscaron reorganizarse y obtener apoyo en el norte.",
+        "La emboscada de Acatita de Bajan golpeo al nucleo original del movimiento y abrio una nueva etapa."
+      ],
+      "historicalContext": "Hidalgo, Allende y otros lideres fueron capturados mientras se desplazaban hacia el norte. Con ello se cerraba la primera fase de la guerra, aunque la insurgencia no desaparecio.",
+      "characterLink": "La captura conjunta muestra que Hidalgo y Allende, pese a sus diferencias, compartian el destino del mando inicial. La continuidad recaeria en otros jefes, especialmente Morelos.",
+      "question": {
+        "prompt": "Que explica mejor la importancia historica de la captura en Acatita de Bajan?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Golpeo al primer nucleo dirigente cuando intentaba reorganizarse en el norte y obligo a que otros caudillos continuaran la lucha.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Cambio de etapa identificado",
+            "message": "La captura no termino la guerra, pero si clausuro el mando original encabezado por Hidalgo y Allende.",
+            "historicalNote": "Tras la ejecucion de los primeros jefes, la insurgencia sobrevivio gracias a nuevos liderazgos regionales.",
+            "journalEntry": "Acatita de Bajan cerro la primera fase insurgente y abrio el paso a nuevos liderazgos como el de Morelos."
+          },
+          {
+            "label": "Consumo la independencia y permitio que el virreinato reconociera de inmediato al nuevo gobierno insurgente.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Fue una represion, no un reconocimiento",
+            "message": "La captura significo represion y ejecucion, no una negociacion exitosa. La guerra continuaria durante años.",
+            "historicalNote": "La consumacion independentista ocurriria mas de una decada despues.",
+            "journalEntry": "La captura de 1811 represento una crisis del movimiento, no su triunfo."
+          },
+          {
+            "label": "Inicio el mandato presidencial de Allende y la conversion del movimiento en una republica estable.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "No existio tal transicion",
+            "message": "Allende fue capturado junto con los demas caudillos. No hubo una republica insurgente estable en ese momento.",
+            "historicalNote": "La construccion politica insurgente seria mas gradual y esta asociada sobre todo al ciclo de Morelos.",
+            "journalEntry": "La crisis de 1811 impidio cualquier institucionalizacion inmediata bajo Allende."
+          }
+        ]
+      }
+    },
+    {
+      "id": "sitio_cuautla",
+      "characterId": "morelos",
+      "sequenceLabel": "Acto VIII",
+      "year": "1812",
+      "location": "Cuautla",
+      "accent": "#9f8153",
+      "background": "src/img/independencia.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Sitio_de_Cuautla",
+      "theme": "scene_8_morelos.mp3",
+      "character": {
+        "name": "Jose Maria Morelos y Pavon",
+        "role": "Comandante del sur con mayor disciplina militar",
+        "image": "src/img/jose-maria-morelos.png"
+      },
+      "eventTitle": "La resistencia de Cuautla",
+      "narration": [
+        "Con Hidalgo y Allende fuera de combate, Morelos sostuvo la guerra en el sur con una organizacion mas estable.",
+        "El sitio de Cuautla puso a prueba su capacidad para resistir, mantener cohesion y preservar la continuidad insurgente."
+      ],
+      "historicalContext": "El asedio dirigido por Calleja no logro destruir a Morelos en un ataque inmediato. La resistencia de Cuautla fortalecio su prestigio y mostro que la insurgencia podia sobrevivir al colapso de su primer liderazgo.",
+      "characterLink": "Si Hidalgo simbolizo el arranque y Allende la disciplina militar temprana, Morelos represento la madurez organizativa que permitio que la guerra siguiera viva.",
+      "question": {
+        "prompt": "Que aprendizaje historico deja el sitio de Cuautla sobre el liderazgo de Morelos?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Que logro sostener la resistencia insurgente con mayor disciplina y continuidad aun bajo un asedio prolongado.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "La resistencia definio su prestigio",
+            "message": "Cuautla consolido la imagen de Morelos como un jefe capaz de mantener orden, resistencia y continuidad estrategica.",
+            "historicalNote": "La salida de Cuautla no fue una victoria total, pero si una demostracion de supervivencia militar y politica.",
+            "journalEntry": "Cuautla mostro que Morelos podia sostener la insurgencia con disciplina y resistencia."
+          },
+          {
+            "label": "Que abandono la guerra del sur para regresar a Dolores y repetir el Grito de 1810.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "No repitio la etapa de Hidalgo",
+            "message": "El liderazgo de Morelos no consistio en repetir el Grito, sino en sostener y reorganizar la guerra en nuevas condiciones.",
+            "historicalNote": "Cada caudillo cumple una funcion distinta en la cronologia insurgente.",
+            "journalEntry": "Morelos no repitio la fase inicial: consolido un mando regional disciplinado."
+          },
+          {
+            "label": "Que su principal logro fue negociar una paz definitiva con Calleja dentro del sitio.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "La guerra continuo",
+            "message": "Cuautla no cerro el conflicto. La importancia de Morelos radico en mantenerlo vivo y proyectarlo hacia una agenda politica.",
+            "historicalNote": "Despues del sitio, la insurgencia siguio buscando bases institucionales para su causa.",
+            "journalEntry": "La relevancia de Cuautla esta en la resistencia insurgente, no en una paz definitiva."
+          }
+        ]
+      }
+    },
+    {
+      "id": "chilpancingo",
+      "characterId": "morelos",
+      "sequenceLabel": "Acto IX",
+      "year": "1813",
+      "location": "Chilpancingo",
+      "accent": "#ad7a4d",
+      "background": "src/img/independencia.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Congreso_de_Chilpancingo",
+      "theme": "scene_9_morelos.mp3",
+      "character": {
+        "name": "Jose Maria Morelos y Pavon",
+        "role": "Conductor politico y militar del sur",
+        "image": "src/img/jose-maria-morelos.png"
+      },
+      "eventTitle": "El Congreso de Chilpancingo da forma politica a la insurgencia",
+      "narration": [
+        "La guerra ya no podia sostenerse solo con victorias militares ocasionales.",
+        "Morelos impulso un congreso para dar legitimidad politica, horizonte institucional y sentido juridico al movimiento."
+      ],
+      "historicalContext": "El Congreso de Chilpancingo declaro la independencia de America Mexicana y busco organizar un poder soberano. Fue un salto de la rebelion armada hacia la construccion de un proyecto politico.",
+      "characterLink": "Morelos heredo la energia de Hidalgo y el aprendizaje militar de la primera etapa, pero los convirtio en un programa politico mas articulado que vinculaba guerra, soberania y gobierno.",
+      "question": {
+        "prompt": "Cual fue el objetivo mas importante del Congreso de Chilpancingo dentro del proceso insurgente?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Dar una base politica y soberana al movimiento insurgente mediante un congreso que representara a la nacion en armas.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "La insurgencia se institucionaliza",
+            "message": "Con Chilpancingo, la lucha dejo de ser solo militar y se proyecto como un orden politico alternativo al virreinato.",
+            "historicalNote": "La declaracion de independencia y la actividad congresional muestran la maduracion del proyecto insurgente bajo Morelos.",
+            "journalEntry": "Chilpancingo dio base politica y soberana a la insurgencia mediante un congreso."
+          },
+          {
+            "label": "Nombrar virrey a Morelos para que gobernara en nombre de Fernando VII.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "No se buscaba reproducir el virreinato",
+            "message": "El congreso insurgente apuntaba a la soberania propia, no a reforzar la estructura virreinal con un nuevo virrey.",
+            "historicalNote": "La aspiracion era construir autoridad propia y no depender del aparato colonial.",
+            "journalEntry": "El Congreso de Chilpancingo no queria conservar el virreinato, sino sustituirlo por soberania insurgente."
+          },
+          {
+            "label": "Cerrar la participacion popular y dejar toda la lucha en manos exclusivas del ejercito realista.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "Ocurria exactamente lo contrario",
+            "message": "El congreso buscaba legitimar a la insurgencia como nacion y ordenar politicamente la movilizacion popular y militar.",
+            "historicalNote": "La guerra siguio, pero ahora conectada a una vision formal de soberania.",
+            "journalEntry": "Chilpancingo amplio la legitimidad insurgente; no la entrego al poder realista."
+          }
+        ]
+      }
+    },
+    {
+      "id": "sentimientos_nacion",
+      "characterId": "morelos",
+      "sequenceLabel": "Acto X",
+      "year": "1813",
+      "location": "Chilpancingo",
+      "accent": "#c18b55",
+      "background": "src/img/independencia.jpg",
+      "wikiUrl": "https://es.wikipedia.org/wiki/Sentimientos_de_la_Naci%C3%B3n",
+      "theme": "scene_10_morelos.mp3",
+      "character": {
+        "name": "Jose Maria Morelos y Pavon",
+        "role": "Autor del programa politico insurgente",
+        "image": "src/img/jose-maria-morelos.png"
+      },
+      "eventTitle": "Sentimientos de la Nacion resume el proyecto insurgente",
+      "narration": [
+        "Morelos llevo la insurgencia a un terreno programatico con un texto que fijaba principios politicos y sociales.",
+        "El documento sintetizaba demandas de soberania, representacion, igualdad y fin de privilegios coloniales."
+      ],
+      "historicalContext": "Sentimientos de la Nacion planteo la independencia, la soberania popular, la supresion de castas y la moderacion de la opulencia y la miseria. No era solo una proclama militar: era una propuesta de pais.",
+      "characterLink": "El texto recoge el impulso iniciado por Hidalgo, aprende de la experiencia militar vivida con Allende y expresa la etapa mas madura del liderazgo de Morelos.",
+      "question": {
+        "prompt": "Que principio pertenece con mayor claridad a Sentimientos de la Nacion?",
+        "points": 10,
+        "options": [
+          {
+            "label": "Que la soberania dimana del pueblo y que deben desaparecer la esclavitud y las distinciones de castas.",
+            "isCorrect": true,
+            "tone": "success",
+            "title": "Principio insurgente reconocido",
+            "message": "Morelos convirtio la experiencia de guerra en una propuesta politica que vinculaba independencia con transformacion social.",
+            "historicalNote": "Sentimientos de la Nacion es central porque define un horizonte de soberania y justicia, no solo una separacion territorial.",
+            "journalEntry": "Sentimientos de la Nacion defendio soberania popular, fin de la esclavitud y superacion de castas."
+          },
+          {
+            "label": "Que la soberania reside exclusivamente en el virrey y que las castas deben reforzarse para mantener el orden colonial.",
+            "isCorrect": false,
+            "tone": "warning",
+            "title": "Eso contradice el proyecto insurgente",
+            "message": "Morelos pretendia desmontar la legitimidad colonial, no fortalecerla. Su texto va en sentido opuesto al orden de castas.",
+            "historicalNote": "La fuerza del documento radica en la ruptura con la jerarquia colonial.",
+            "journalEntry": "Morelos no defendio la soberania virreinal ni el sistema de castas: los combatio."
+          },
+          {
+            "label": "Que la independencia solo era economica y no implicaba cambios sociales ni politicos.",
+            "isCorrect": false,
+            "tone": "danger",
+            "title": "La propuesta era integral",
+            "message": "Sentimientos de la Nacion unia independencia politica con transformaciones sociales y principios de justicia.",
+            "historicalNote": "Reducir el documento a economia borra su alcance moral, politico y juridico.",
+            "journalEntry": "El programa de Morelos fue politico y social, no unicamente economico."
+          }
+        ]
+      }
+    }
+  ],
+  "finale": {
+    "title": "Consejo final de la memoria insurgente",
+    "summary": "Ya recorriste la ruta que une conspiracion, guerra y proyecto politico. Resuelve estas decisiones finales para demostrar que entendiste como se relacionan los personajes y los eventos.",
+    "presenter": {
+      "name": "Jose Maria Morelos y Pavon",
+      "role": "Guia de la evaluacion final",
+      "image": "src/img/jose-maria-morelos.png",
+      "background": "src/img/independencia.jpg",
+      "accent": "#c79c5c"
+    },
+    "questions": [
+      {
+        "id": "final_roles",
+        "sequenceLabel": "Evaluacion I",
+        "year": "Sintesis de personajes",
+        "location": "Memoria insurgente",
+        "eventTitle": "Roles de Hidalgo y Allende",
+        "narration": [
+          "La primera etapa insurgente no depende de un solo caudillo.",
+          "Comprenderla implica distinguir el liderazgo social de Hidalgo y el perfil militar de Allende."
+        ],
+        "historicalContext": "Ambos compartieron objetivos inmediatos, pero no siempre coincidieron en la manera de conducir la guerra ni en el tipo de ejercito que necesitaban.",
+        "characterLink": "La relacion entre Hidalgo y Allende se explica por complementariedad inicial y tensiones estrategicas posteriores.",
+        "question": {
+          "prompt": "Cual opcion describe mejor la relacion entre Hidalgo y Allende?",
+          "points": 10,
+          "options": [
+            {
+              "label": "Hidalgo aporto movilizacion popular y liderazgo simbolico; Allende, experiencia militar y exigencia de disciplina.",
+              "isCorrect": true,
+              "tone": "success",
+              "title": "Sintesis precisa",
+              "message": "Esa combinacion explica por que pudieron impulsar juntos el movimiento y tambien por que surgieron desacuerdos tacticos.",
+              "historicalNote": "La primera fase insurgente es inseparable de esa colaboracion tensa entre carisma politico y estrategia militar.",
+              "journalEntry": "Hidalgo simboliza la convocatoria popular y Allende la organizacion militar temprana."
+            },
+            {
+              "label": "Ambos se dedicaron exclusivamente a redactar constituciones y nunca dirigieron tropas en campana.",
+              "isCorrect": false,
+              "tone": "warning",
+              "title": "Falta la dimension militar",
+              "message": "La etapa de Hidalgo y Allende estuvo profundamente marcada por la movilizacion armada y la conduccion de tropas insurgentes.",
+              "historicalNote": "La construccion constitucional madura aparecio despues, sobre todo con Morelos.",
+              "journalEntry": "Hidalgo y Allende fueron lideres de campana antes que redactores de constituciones."
+            },
+            {
+              "label": "Allende fue el principal autor de Sentimientos de la Nacion y Hidalgo dirigio el Congreso de Chilpancingo.",
+              "isCorrect": false,
+              "tone": "danger",
+              "title": "Cruce de personajes y etapas",
+              "message": "Esos hitos pertenecen al liderazgo de Morelos y a una fase posterior del movimiento.",
+              "historicalNote": "Distinguir cronologias ayuda a entender la evolucion real de la insurgencia.",
+              "journalEntry": "Sentimientos de la Nacion y Chilpancingo pertenecen al ciclo de Morelos, no al de Hidalgo y Allende."
+            }
+          ]
+        }
+      },
+      {
+        "id": "final_continuidad",
+        "sequenceLabel": "Evaluacion II",
+        "year": "Continuidad del movimiento",
+        "location": "Memoria insurgente",
+        "eventTitle": "De Hidalgo a Morelos",
+        "narration": [
+          "La insurgencia sobrevivio a la captura de sus primeros jefes.",
+          "El hilo conductor no fue identico, pero si mantuvo una continuidad entre la rebelion inicial y el proyecto politico posterior."
+        ],
+        "historicalContext": "Morelos recibio una mision de Hidalgo en 1810 y luego elaboro un programa propio que dio mayor definicion politica a la causa insurgente.",
+        "characterLink": "La continuidad entre ambos reside en que Morelos recoge la rebelion iniciada por Hidalgo, la organiza y la formula como soberania.",
+        "question": {
+          "prompt": "Que expresa mejor la relacion historica entre Hidalgo y Morelos?",
+          "points": 10,
+          "options": [
+            {
+              "label": "Morelos recibio de Hidalgo la encomienda de abrir el frente del sur y despues transformo esa experiencia en un proyecto politico mas articulado.",
+              "isCorrect": true,
+              "tone": "success",
+              "title": "Continuidad bien entendida",
+              "message": "La ruta insurgente no se interrumpe por completo: cambia de liderazgo y gana definicion politica con Morelos.",
+              "historicalNote": "Sin Hidalgo no se entiende el origen del movimiento; sin Morelos no se entiende su maduracion politica.",
+              "journalEntry": "Morelos continua la rebelion iniciada por Hidalgo y la convierte en un proyecto politico soberano."
+            },
+            {
+              "label": "Morelos lucho siempre contra Hidalgo y su objetivo fue restaurar por completo el poder virreinal.",
+              "isCorrect": false,
+              "tone": "warning",
+              "title": "Relacion invertida",
+              "message": "Morelos no restaura el virreinato: prolonga y profundiza la insurgencia que Hidalgo habia puesto en marcha.",
+              "historicalNote": "La continuidad insurgente se observa en la defensa de la independencia y la soberania propia.",
+              "journalEntry": "Morelos no fue rival restaurador de Hidalgo; fue continuador y reformulador de la insurgencia."
+            },
+            {
+              "label": "Ambos actuaron en 1821 junto con Iturbide para consumar inmediatamente la independencia.",
+              "isCorrect": false,
+              "tone": "danger",
+              "title": "Cronologia desplazada",
+              "message": "Hidalgo y Morelos murieron antes de 1821. Su legado influyo en la historia posterior, pero no participaron en la consumacion.",
+              "historicalNote": "Diferenciar entre inicio, desarrollo y consumacion es esencial para estudiar la independencia.",
+              "journalEntry": "Hidalgo y Morelos pertenecen a fases previas de la independencia, no al cierre de 1821."
+            }
+          ]
+        }
+      },
+      {
+        "id": "final_secuencia",
+        "sequenceLabel": "Evaluacion III",
+        "year": "Cronologia",
+        "location": "Memoria insurgente",
+        "eventTitle": "Secuencia de la ruta insurgente",
+        "narration": [
+          "El aprendizaje historico tambien depende de ordenar hechos y comprender sus conexiones.",
+          "Esta ultima decision resume la cadena que une conspiracion, levantamiento y proyecto politico."
+        ],
+        "historicalContext": "La independencia avanzo por etapas: conspiracion, movilizacion armada, crisis del mando inicial, reorganizacion regional y formulacion soberana.",
+        "characterLink": "La mejor secuencia es la que permite ver como Hidalgo y Allende inauguran la ruta y como Morelos la reorganiza y la politiza.",
+        "question": {
+          "prompt": "Que secuencia resume con mayor precision el hilo historico del juego?",
+          "points": 10,
+          "options": [
+            {
+              "label": "Descubrimiento de la conspiracion de Queretaro, Grito de Dolores, victorias y crisis del mando inicial, mision a Morelos, Congreso de Chilpancingo y Sentimientos de la Nacion.",
+              "isCorrect": true,
+              "tone": "success",
+              "title": "Cronologia completa",
+              "message": "Ordenaste correctamente la evolucion del movimiento desde su arranque conspirativo hasta su madurez politica.",
+              "historicalNote": "La insurgencia no fue una sola escena heroica: fue un proceso de continuidad, conflicto y reorganizacion.",
+              "journalEntry": "La ruta insurgente une conspiracion, Grito, crisis militar y reorganizacion politica con Morelos."
+            },
+            {
+              "label": "Congreso de Chilpancingo, Grito de Dolores, Tratados de Cordoba, conspiracion de Queretaro y captura de Hidalgo.",
+              "isCorrect": false,
+              "tone": "warning",
+              "title": "La secuencia se rompe",
+              "message": "Esa opcion mezcla hechos de 1810, 1813 y 1821 sin respetar la continuidad del proceso insurgente.",
+              "historicalNote": "Dominar la cronologia es clave para no mezclar momentos y liderazgos distintos.",
+              "journalEntry": "La independencia debe estudiarse por etapas; mezclar 1810, 1813 y 1821 distorsiona el proceso."
+            },
+            {
+              "label": "Toma de Acapulco, consumacion de 1821, Grito de Dolores y despues descubrimiento de la conspiracion.",
+              "isCorrect": false,
+              "tone": "danger",
+              "title": "La causa aparece despues del efecto",
+              "message": "La conspiracion y el Grito anteceden a las campanas del sur y, mucho mas aun, a la consumacion de 1821.",
+              "historicalNote": "Comprender que hechos desencadenan otros ayuda a leer la independencia como proceso historico.",
+              "journalEntry": "La conspiracion de Queretaro y el Grito anteceden a las campanas de Morelos y a la consumacion."
+            }
+          ]
+        }
+      }
+    ],
+    "rankings": [
+      {
+        "id": "cronista",
+        "minScore": 110,
+        "title": "Cronista insurgente",
+        "description": "Reconstruyes con solidez la relacion entre personajes, contextos y decisiones politicas de la Independencia."
+      },
+      {
+        "id": "estratega",
+        "minScore": 80,
+        "title": "Estratega de la memoria",
+        "description": "Comprendes la mayor parte de la ruta insurgente y distingues con claridad los momentos decisivos del proceso."
+      },
+      {
+        "id": "aprendiz",
+        "minScore": 0,
+        "title": "Aprendiz de la ruta",
+        "description": "Ya tienes la secuencia general. Otra vuelta te ayudara a fijar mejor la cronologia y la relacion entre los caudillos."
+      }
+    ]
+  }
+}
