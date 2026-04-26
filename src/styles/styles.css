@@ -148,8 +148,9 @@ body {
 .impuro-book-face--content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.9rem;
+  overflow-y: auto;
 }
 
 .impuro-title,
@@ -341,6 +342,14 @@ body {
   overflow: hidden;
 }
 
+/* Card body: scrollable cuando el contenido supera la card */
+.impuro-card-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .impuro-card-toggle {
   display: none;
   width: 100%;
@@ -355,15 +364,19 @@ body {
   cursor: pointer;
 }
 
-.impuro-card-body {
-  display: block;
-}
+/* .impuro-card-body — definido arriba junto a .impuro-page-card */
 
 .impuro-page-card--question-journal {
   gap: 0.75rem;
   grid-column: 1 / -1;
   overflow: auto;
   padding-right: 0.8rem;
+}
+
+/* La card de pregunta/bitacora ya scrollea a nivel de card — el body no debe hacer doble scroll */
+.impuro-page-card--question-journal .impuro-card-body {
+  flex: unset;
+  overflow: visible;
 }
 
 .impuro-page-card--portrait {
@@ -378,6 +391,12 @@ body {
   grid-column: 1 / -1;
   gap: 0.65rem;
   overflow: auto;
+}
+
+/* Ending card ya scrollea a nivel de card */
+.impuro-page-card--ending-combined .impuro-card-body {
+  flex: unset;
+  overflow: visible;
 }
 
 .impuro-ending-review-block {
@@ -444,6 +463,7 @@ body {
   display: grid;
   gap: 0.35rem;
   align-content: start;
+  overflow-y: auto;
 }
 
 .impuro-final-profile-role {
@@ -472,16 +492,16 @@ body {
 .impuro-character-frame {
   flex: 0 0 auto;
   width: 100%;
-  height: clamp(320px, 58vh, 620px);
-  min-height: 320px;
-  max-height: 620px;
+  height: clamp(200px, 38vh, 420px);
+  min-height: 200px;
+  max-height: 420px;
   border-radius: 18px;
   border: 1px solid rgba(255, 240, 214, 0.14);
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--scene-accent) 24%, transparent), transparent 42%),
     linear-gradient(180deg, rgba(247, 234, 211, 0.05), rgba(11, 8, 8, 0.14));
   overflow: hidden;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.65rem;
 }
 
 .impuro-character-frame img {
@@ -533,6 +553,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .impuro-context-card {

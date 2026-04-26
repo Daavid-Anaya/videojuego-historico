@@ -205,6 +205,535 @@ class AudioManager {
   }
 }
 
+// ---------------------------------------------------------------------------
+// SynthAudioManager — Web Audio API synthesizer, no external files required.
+// Extends AudioManager keeping the exact same public interface so the rest of
+// the game code never needs to change.
+// ---------------------------------------------------------------------------
+class SynthAudioManager extends AudioManager {
+  constructor(config = {}) {
+    super(config);
+    this._ctx = null;           // AudioContext — created on first user gesture
+    this._bgNodes = null;       // { oscillators, gainNode } for the current loop
+    this._bgName = null;        // logical name of the running background track
+    this._bgPaused = false;
+    this._bgGainTarget = 0;
+  }
+
+  // ------------------------------------------------------------------
+  // AudioContext — lazy init; browsers block audio before a user gesture
+  // ------------------------------------------------------------------
+  _getCtx() {
+    if (!this._ctx) {
+      this._ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this._ctx.state === "suspended") {
+      this._ctx.resume().catch(() => {});
+    }
+    return this._ctx;
+  }
+
+  // ------------------------------------------------------------------
+  // Low-level helpers
+  // ------------------------------------------------------------------
+
+  /** Schedule a gain ramp from current value to `value` over `duration` seconds. */
+  _ramp(gainNode, value, duration, ctx) {
+    const t = ctx.currentTime;
+    gainNode.gain.cancelScheduledValues(t);
+    gainNode.gain.setValueAtTime(gainNode.gain.value, t);
+    gainNode.gain.linearRampToValueAtTime(value, t + duration);
+  }
+
+  /**
+   * Create a chain: oscillator(s) → gain → masterGain → destination.
+   * Returns { oscillators, gainNode, masterGain } so callers can clean up.
+   */
+  _createOscChain(ctx, specs, gainValue, masterVolume) {
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    masterGain.connect(ctx.destination);
+
+    const oscillators = specs.map(({ type, freq, detuneValue }) => {
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      if (detuneValue) {
+        osc.detune.setValueAtTime(detuneValue, ctx.currentTime);
+      }
+      oscGain.gain.setValueAtTime(gainValue, ctx.currentTime);
+      osc.connect(oscGain);
+      oscGain.connect(masterGain);
+      osc.start();
+      return osc;
+    });
+
+    // Fade in
+    masterGain.gain.linearRampToValueAtTime(masterVolume, ctx.currentTime + 0.04);
+
+    return { oscillators, masterGain };
+  }
+
+  /** Play a one-shot envelope: attack → sustain → release. */
+  _oneShot(specs, { attack = 0.01, sustain = 0.12, release = 0.18, volume = 0.18 } = {}) {
+    if (!this.enabled) {
+      return;
+    }
+    const ctx = this._getCtx();
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0, ctx.currentTime);
+    master.connect(ctx.destination);
+
+    const oscs = specs.map(({ type, freq, freqEnd, detuneValue, gainScale = 1 }) => {
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      if (freqEnd !== undefined) {
+        osc.frequency.linearRampToValueAtTime(freqEnd, ctx.currentTime + attack + sustain + release);
+      }
+      if (detuneValue) {
+        osc.detune.setValueAtTime(detuneValue, ctx.currentTime);
+      }
+      oscGain.gain.setValueAtTime(gainScale, ctx.currentTime);
+      osc.connect(oscGain);
+      oscGain.connect(master);
+      osc.start();
+      return osc;
+    });
+
+    const t = ctx.currentTime;
+    master.gain.linearRampToValueAtTime(volume, t + attack);
+    master.gain.setValueAtTime(volume, t + attack + sustain);
+    master.gain.linearRampToValueAtTime(0, t + attack + sustain + release);
+
+    const total = attack + sustain + release + 0.05;
+    oscs.forEach((osc) => osc.stop(ctx.currentTime + total));
+  }
+
+  /** Sequence of one-shots played with offsets (simple arpeggio / melody). */
+  _sequence(notes, globalOpts = {}) {
+    if (!this.enabled) {
+      return;
+    }
+    const ctx = this._getCtx();
+    const { volume = 0.18, attack = 0.01, sustain = 0.1, release = 0.12, type = "sine" } = globalOpts;
+
+    notes.forEach(({ freq, offset = 0, dur = sustain, vol = volume, oscType = type }) => {
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0, ctx.currentTime);
+      master.connect(ctx.destination);
+
+      const osc = ctx.createOscillator();
+      osc.type = oscType;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.connect(master);
+      osc.start(ctx.currentTime + offset);
+
+      const t0 = ctx.currentTime + offset;
+      master.gain.setValueAtTime(0, t0);
+      master.gain.linearRampToValueAtTime(vol, t0 + attack);
+      master.gain.setValueAtTime(vol, t0 + attack + dur);
+      master.gain.linearRampToValueAtTime(0, t0 + attack + dur + release);
+      osc.stop(t0 + attack + dur + release + 0.05);
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // Sound event synthesizers
+  // ------------------------------------------------------------------
+
+  _sfxStart() {
+    // Ascending heroic hit: two-tone percussive chord + sweep
+    this._oneShot(
+      [
+        { type: "triangle", freq: 220, freqEnd: 440 },
+        { type: "sine",     freq: 330, freqEnd: 660, gainScale: 0.6 },
+      ],
+      { attack: 0.02, sustain: 0.18, release: 0.35, volume: 0.22 }
+    );
+    // Metallic strike
+    this._oneShot(
+      [{ type: "square", freq: 880, freqEnd: 440, gainScale: 0.3 }],
+      { attack: 0.001, sustain: 0.04, release: 0.12, volume: 0.12 }
+    );
+  }
+
+  _sfxMenuOpen() {
+    // Soft metallic tonk
+    this._oneShot(
+      [
+        { type: "triangle", freq: 660 },
+        { type: "sine",     freq: 990, gainScale: 0.4 },
+      ],
+      { attack: 0.005, sustain: 0.04, release: 0.22, volume: 0.14 }
+    );
+  }
+
+  _sfxMenuClose() {
+    // Inverse tonk (descending)
+    this._oneShot(
+      [{ type: "triangle", freq: 550, freqEnd: 330 }],
+      { attack: 0.005, sustain: 0.04, release: 0.18, volume: 0.13 }
+    );
+  }
+
+  _sfxStoryOpen() {
+    // "Parchment unfurl": low rumble + high shimmer
+    this._sequence(
+      [
+        { freq: 196, offset: 0,    dur: 0.08, vol: 0.1,  oscType: "triangle" },
+        { freq: 392, offset: 0.06, dur: 0.08, vol: 0.12, oscType: "triangle" },
+        { freq: 784, offset: 0.12, dur: 0.1,  vol: 0.1,  oscType: "sine"     },
+      ],
+      { attack: 0.01, release: 0.2 }
+    );
+  }
+
+  _sfxStoryClose() {
+    // Reverse shimmer
+    this._sequence(
+      [
+        { freq: 784, offset: 0,    dur: 0.06, vol: 0.08, oscType: "sine"     },
+        { freq: 392, offset: 0.05, dur: 0.07, vol: 0.09, oscType: "triangle" },
+        { freq: 196, offset: 0.1,  dur: 0.08, vol: 0.07, oscType: "triangle" },
+      ],
+      { attack: 0.01, release: 0.18 }
+    );
+  }
+
+  _sfxPageTurn() {
+    // White noise burst shaped like a page whoosh
+    if (!this.enabled) {
+      return;
+    }
+    const ctx = this._getCtx();
+    const bufferSize = ctx.sampleRate * 0.12;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i += 1) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(2200, ctx.currentTime);
+    filter.frequency.linearRampToValueAtTime(800, ctx.currentTime + 0.12);
+    filter.Q.value = 0.8;
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.22, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.12);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + 0.15);
+  }
+
+  _sfxCorrect() {
+    // Fanfare: major triad arpeggio ascending, warm and resolving
+    this._sequence(
+      [
+        { freq: 261.63, offset: 0,    dur: 0.1,  vol: 0.18, oscType: "triangle" }, // C4
+        { freq: 329.63, offset: 0.1,  dur: 0.1,  vol: 0.18, oscType: "triangle" }, // E4
+        { freq: 392.00, offset: 0.2,  dur: 0.1,  vol: 0.18, oscType: "triangle" }, // G4
+        { freq: 523.25, offset: 0.3,  dur: 0.22, vol: 0.22, oscType: "sine"     }, // C5
+      ],
+      { attack: 0.01, release: 0.25 }
+    );
+    // Shimmer on top
+    this._oneShot(
+      [{ type: "sine", freq: 1046.5, freqEnd: 1046.5 }],
+      { attack: 0.3, sustain: 0.15, release: 0.3, volume: 0.08 }
+    );
+  }
+
+  _sfxIncorrect() {
+    // Dissonant descending minor: low and grave
+    this._sequence(
+      [
+        { freq: 311.13, offset: 0,    dur: 0.12, vol: 0.16, oscType: "sawtooth" }, // Eb4
+        { freq: 207.65, offset: 0.12, dur: 0.18, vol: 0.16, oscType: "sawtooth" }, // Ab3
+      ],
+      { attack: 0.02, release: 0.28 }
+    );
+    // Rumble
+    this._oneShot(
+      [{ type: "sine", freq: 80, freqEnd: 55 }],
+      { attack: 0.02, sustain: 0.12, release: 0.22, volume: 0.14 }
+    );
+  }
+
+  _sfxSceneAdvance() {
+    // Purposeful step forward: low strike + mid tone
+    this._sequence(
+      [
+        { freq: 146.83, offset: 0,    dur: 0.08, vol: 0.14, oscType: "triangle" }, // D3
+        { freq: 220.00, offset: 0.08, dur: 0.14, vol: 0.16, oscType: "sine"     }, // A3
+        { freq: 293.66, offset: 0.2,  dur: 0.18, vol: 0.14, oscType: "triangle" }, // D4
+      ],
+      { attack: 0.01, release: 0.2 }
+    );
+  }
+
+  _sfxEndingReveal() {
+    // Full resolution: major chord swell with shimmer cascade
+    this._sequence(
+      [
+        { freq: 130.81, offset: 0,    dur: 0.4,  vol: 0.16, oscType: "triangle" }, // C3
+        { freq: 196.00, offset: 0.1,  dur: 0.35, vol: 0.14, oscType: "triangle" }, // G3
+        { freq: 261.63, offset: 0.2,  dur: 0.35, vol: 0.16, oscType: "sine"     }, // C4
+        { freq: 329.63, offset: 0.3,  dur: 0.35, vol: 0.16, oscType: "sine"     }, // E4
+        { freq: 392.00, offset: 0.4,  dur: 0.35, vol: 0.14, oscType: "sine"     }, // G4
+        { freq: 523.25, offset: 0.5,  dur: 0.5,  vol: 0.2,  oscType: "sine"     }, // C5
+        { freq: 1046.5, offset: 0.65, dur: 0.4,  vol: 0.1,  oscType: "sine"     }, // C6
+      ],
+      { attack: 0.02, release: 0.5 }
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // Background music synthesizer
+  // Each track is a drone/ostinato loop built from oscillators.
+  // We re-create the nodes on each track change and let them loop via
+  // a ScriptProcessor-free approach: we schedule notes far ahead and
+  // rely on the Web Audio clock. For simplicity we build a ~4-bar
+  // pattern and repeat with setInterval.
+  // ------------------------------------------------------------------
+
+  _stopBgNodes() {
+    if (!this._bgNodes) {
+      return;
+    }
+    const { oscillators, masterGain } = this._bgNodes;
+    const ctx = this._ctx;
+    if (ctx) {
+      const t = ctx.currentTime;
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(0, t + 0.8);
+      oscillators.forEach((osc) => {
+        try { osc.stop(t + 0.9); } catch (_e) { /* already stopped */ }
+      });
+    }
+    if (this._bgInterval) {
+      clearInterval(this._bgInterval);
+      this._bgInterval = null;
+    }
+    this._bgNodes = null;
+  }
+
+  /**
+   * Build a generative ambient loop.
+   * `profile` has: { rootFreqs, type, detune, vol, speed }
+   */
+  _startBgLoop(profile) {
+    const ctx = this._getCtx();
+    const { rootFreqs, type = "sine", vol = 0.08, speed = 4000 } = profile;
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    masterGain.connect(ctx.destination);
+
+    // Subtle reverb via delay
+    const delay = ctx.createDelay(0.6);
+    delay.delayTime.setValueAtTime(0.38, ctx.currentTime);
+    const delayGain = ctx.createGain();
+    delayGain.gain.setValueAtTime(0.22, ctx.currentTime);
+    masterGain.connect(delay);
+    delay.connect(delayGain);
+    delayGain.connect(masterGain);
+
+    // One oscillator per root frequency, slightly detuned for width
+    const oscillators = rootFreqs.flatMap((freq, i) => {
+      const oscs = [];
+      [-6, 0, 5].forEach((cents) => {
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.detune.setValueAtTime(cents, ctx.currentTime);
+        oscGain.gain.setValueAtTime(i === 0 ? 1 : 0.6, ctx.currentTime);
+        osc.connect(oscGain);
+        oscGain.connect(masterGain);
+        osc.start();
+        oscs.push(osc);
+      });
+      return oscs;
+    });
+
+    // Fade in
+    masterGain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 2.0);
+
+    // Slow tremolo via LFO on master gain
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.setValueAtTime(0.18, ctx.currentTime);
+    lfoGain.gain.setValueAtTime(vol * 0.18, ctx.currentTime);
+    lfo.connect(lfoGain);
+    lfoGain.connect(masterGain.gain);
+    lfo.start();
+    oscillators.push(lfo);
+
+    // Slow chord shift: every `speed` ms pick the next root as the "melody"
+    let step = 0;
+    const melody = rootFreqs;
+    this._bgInterval = setInterval(() => {
+      if (!this._bgNodes || !this._ctx || this._bgPaused) {
+        return;
+      }
+      step = (step + 1) % melody.length;
+      // Gently bump the first oscillator to the next frequency in the set
+      try {
+        const target = oscillators[0];
+        const t = this._ctx.currentTime;
+        target.frequency.cancelScheduledValues(t);
+        target.frequency.setValueAtTime(target.frequency.value, t);
+        target.frequency.linearRampToValueAtTime(melody[step], t + (speed / 1000) * 0.8);
+      } catch (_e) { /* context may have been closed */ }
+    }, speed);
+
+    this._bgNodes = { oscillators, masterGain };
+  }
+
+  /** Map a track name to an oscillator profile. */
+  _resolveTrackProfile(name) {
+    // Normalize: strip extension, lowercase
+    const key = String(name || "").replace(/\.[^.]+$/, "").toLowerCase();
+
+    // Menu — mysterious, minor, low drone
+    if (key.includes("menu")) {
+      return { rootFreqs: [55, 82.41, 110, 164.81], type: "sine", vol: 0.07, speed: 5500 };
+    }
+
+    // Ending — majestic, major, brighter
+    if (key.includes("end")) {
+      return { rootFreqs: [130.81, 196, 261.63, 329.63], type: "triangle", vol: 0.08, speed: 4800 };
+    }
+
+    // Allende — martial, tense, mid-range sawtooth
+    if (key.includes("allende")) {
+      return { rootFreqs: [73.42, 110, 146.83, 196], type: "sawtooth", vol: 0.055, speed: 3800 };
+    }
+
+    // Hidalgo — noble, earnest, triangle
+    if (key.includes("hidalgo")) {
+      return { rootFreqs: [65.41, 98, 130.81, 196], type: "triangle", vol: 0.065, speed: 4200 };
+    }
+
+    // Morelos — spiritual, reflective, sine
+    if (key.includes("morelos")) {
+      return { rootFreqs: [87.31, 130.81, 174.61, 261.63], type: "sine", vol: 0.07, speed: 5000 };
+    }
+
+    // Generic fallback
+    return { rootFreqs: [55, 82.41, 110], type: "sine", vol: 0.06, speed: 5000 };
+  }
+
+  // ------------------------------------------------------------------
+  // Event dispatcher: overrides AudioManager.play()
+  // ------------------------------------------------------------------
+  play(name) {
+    if (!this.enabled) {
+      return;
+    }
+
+    switch (name) {
+      case "ui.start":          this._sfxStart();         break;
+      case "ui.menu.open":      this._sfxMenuOpen();      break;
+      case "ui.menu.close":     this._sfxMenuClose();     break;
+      case "ui.story.open":     this._sfxStoryOpen();     break;
+      case "ui.story.close":    this._sfxStoryClose();    break;
+      case "ui.page.turn":      this._sfxPageTurn();      break;
+      case "ui.choice.correct": this._sfxCorrect();       break;
+      case "ui.choice.incorrect":this._sfxIncorrect();    break;
+      case "scene.advance":     this._sfxSceneAdvance();  break;
+      case "ending.reveal":     this._sfxEndingReveal();  break;
+      default:
+        // Unknown event — silently ignore (no broken Audio() calls)
+        break;
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Background music: overrides AudioManager background methods
+  // ------------------------------------------------------------------
+  playBackground(name) {
+    if (!this.enabled) {
+      return;
+    }
+
+    if (this._bgName === name && this._bgNodes) {
+      if (this._bgPaused) {
+        this._resumeBg();
+      }
+      return;
+    }
+
+    this._stopBgNodes();
+    this._bgName = name;
+    this._bgPaused = false;
+
+    const profile = this._resolveTrackProfile(name);
+    this._startBgLoop(profile);
+  }
+
+  pauseBackground() {
+    if (!this._bgNodes || this._bgPaused) {
+      return;
+    }
+    const ctx = this._ctx;
+    if (ctx) {
+      const { masterGain } = this._bgNodes;
+      this._ramp(masterGain, 0, 0.5, ctx);
+    }
+    this._bgPaused = true;
+  }
+
+  _resumeBg() {
+    if (!this._bgNodes || !this._bgPaused) {
+      return;
+    }
+    const ctx = this._ctx;
+    if (ctx) {
+      const { masterGain } = this._bgNodes;
+      const profile = this._resolveTrackProfile(this._bgName || "");
+      this._ramp(masterGain, profile.vol, 1.0, ctx);
+    }
+    this._bgPaused = false;
+  }
+
+  resumeBackground() {
+    if (!this.enabled) {
+      return;
+    }
+
+    if (this._bgNodes && this._bgPaused) {
+      this._resumeBg();
+      return;
+    }
+
+    if (this._bgName) {
+      this.playBackground(this._bgName);
+    }
+  }
+
+  stopBackground() {
+    this._stopBgNodes();
+    this._bgName = null;
+    this._bgPaused = false;
+    // Also clear parent-class state for consistency
+    this.currentBackgroundName = null;
+    this.currentBackgroundSource = null;
+    this.backgroundPaused = false;
+  }
+}
+
 class ImpuroStoryGame {
   constructor(root, options = {}) {
     this.root = root;
@@ -212,7 +741,7 @@ class ImpuroStoryGame {
     this.runtime = options.runtime || RUNTIME.TWINE;
     this.onFinish = typeof options.onFinish === "function" ? options.onFinish : null;
     this.abortController = new AbortController();
-    this.audio = new AudioManager(this.config.sounds || {});
+    this.audio = new SynthAudioManager(this.config.sounds || {});
     // Start muted by default; user must explicitly enable audio via the toggle.
     this.audio.enabled = false;
     this.characterProfiles = new Map(ensureArray(this.config.characterProfiles).map((profile) => [profile.id, profile]));
@@ -282,7 +811,7 @@ class ImpuroStoryGame {
             <article class="impuro-book-face impuro-book-face--cover">
               <p class="impuro-overline">${escapeHtml(this.config.meta?.subtitle || "")}</p>
               <h1 class="impuro-title">${escapeHtml(this.config.meta?.title || "")}</h1>
-              <p class="impuro-intro-kicker">${escapeHtml(this.config.meta?.storyLabel || "")}${this.config.meta?.referenceLabel ? ` | ${escapeHtml(this.config.meta.referenceLabel)}` : ""}</p>
+              <p class="impuro-kicker">${escapeHtml(this.config.meta?.storyLabel || "")}${this.config.meta?.referenceLabel ? ` | ${escapeHtml(this.config.meta.referenceLabel)}` : ""}</p>
             </article>
             <article class="impuro-book-face impuro-book-face--content">
               <h2 class="impuro-intro-title">${escapeHtml(this.config.meta?.introTitle || "")}</h2>
@@ -663,11 +1192,18 @@ class ImpuroStoryGame {
   }
 
   bindAudioUnlock() {
-    if (!this.audio?.enabled || typeof window === "undefined") {
+    if (typeof window === "undefined") {
       return;
     }
 
+    // Register the unlock gesture regardless of current enabled state so that
+    // SynthAudioManager can warm up its AudioContext on the first user gesture.
+    // When audio is off this is a no-op beyond the context resume.
     const unlock = () => {
+      if (this.audio instanceof SynthAudioManager) {
+        // Warm up the AudioContext so it's ready the moment the user enables sound.
+        try { this.audio._getCtx(); } catch (_e) { /* ignore */ }
+      }
       if (this.audio?.enabled && this.currentScreen === GAME_STATES.INTRO) {
         this.syncBackgroundTrack();
       }
