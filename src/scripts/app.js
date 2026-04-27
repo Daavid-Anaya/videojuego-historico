@@ -781,6 +781,7 @@ class ImpuroStoryGame {
       questionFocusIndex: 0,
       finalArchiveTab: "hidalgo",
       score: 0,
+      streak: 0,           // racha de respuestas correctas consecutivas
       answers: [],
       journal: [],
       optionOrderByEntry: {},
@@ -833,8 +834,9 @@ class ImpuroStoryGame {
           <header class="impuro-hud">
             <div class="impuro-hud-chip"><span class="impuro-hud-label">Tramo</span><strong data-ref="hud-act"></strong></div>
             <div class="impuro-hud-chip"><span class="impuro-hud-label">Puntaje</span><strong data-ref="hud-score"></strong></div>
-            <div class="impuro-hud-chip"><span class="impuro-hud-label">Progreso</span><strong data-ref="hud-progress"></strong></div>
+            <div class="impuro-hud-chip"><span class="impuro-hud-label">Progreso</span><strong data-ref="hud-progress"></strong><div class="impuro-hud-progress-bar" aria-hidden="true"><div class="impuro-hud-progress-fill" data-ref="hud-progress-fill"></div></div></div>
             <div class="impuro-hud-chip"><span class="impuro-hud-label">Pagina</span><strong data-ref="hud-page"></strong></div>
+            <div class="impuro-hud-streak" data-ref="hud-streak" hidden aria-live="polite" aria-label="Racha de respuestas correctas"></div>
             <button type="button" class="impuro-hud-chip impuro-hud-chip--action" data-ref="menu-btn"><span class="impuro-hud-label">Sesion</span><strong>Menu</strong></button>
             <button type="button" class="impuro-hud-chip impuro-hud-chip--action impuro-hud-story-btn" data-ref="story-btn"><span class="impuro-hud-label">Historia</span><strong>${escapeHtml(this.config.meta?.historyButtonLabel || "Ver historia")}</strong></button>
           </header>
@@ -1005,6 +1007,8 @@ class ImpuroStoryGame {
       hudAct: this.root.querySelector('[data-ref="hud-act"]'),
       hudScore: this.root.querySelector('[data-ref="hud-score"]'),
       hudProgress: this.root.querySelector('[data-ref="hud-progress"]'),
+      hudProgressFill: this.root.querySelector('[data-ref="hud-progress-fill"]'),
+      hudStreak: this.root.querySelector('[data-ref="hud-streak"]'),
       hudPage: this.root.querySelector('[data-ref="hud-page"]'),
       menuBtn: this.root.querySelector('[data-ref="menu-btn"]'),
       storyBtn: this.root.querySelector('[data-ref="story-btn"]'),
@@ -1315,6 +1319,14 @@ class ImpuroStoryGame {
 
   movePlayPanel(step) {
     const previousIndex = this.state.playPanelIndex;
+    // Si el usuario avanza de panel, completar el typewriter de golpe
+    this.cancelTypewriter();
+    if (this.refs.storyNarration) {
+      const entry = this.getCurrentEntry();
+      if (entry) {
+        this.refs.storyNarration.innerHTML = toParagraphs(entry.narration);
+      }
+    }
     this.setPlayPanel(this.state.playPanelIndex + step);
     if (this.state.playPanelIndex !== previousIndex) {
       this.audio.play("ui.page.turn");
@@ -1799,6 +1811,7 @@ class ImpuroStoryGame {
   }
 
   restart() {
+    this.cancelTypewriter();
     this.clearSavedProgress();
     this.updateContinueAvailability();
     this.state = this.createInitialState();
@@ -1832,6 +1845,7 @@ class ImpuroStoryGame {
       if (!answerRecord) {
         const points = Number(entry.question.points || this.config.gameplay?.pointsPerCorrect || 0);
         this.state.score += points;
+        this.state.streak += 1;          // sube la racha solo en primera respuesta correcta
         this.state.answers.push({
           id: this.getEntryKey(entry),
           eventTitle: entry.eventTitle,
@@ -1856,6 +1870,7 @@ class ImpuroStoryGame {
     } else {
       const penalty = Math.abs(Number(this.config.gameplay?.pointsPenaltyWrong ?? 3));
       this.state.score = Math.max(0, this.state.score - penalty);
+      this.state.streak = 0;             // se rompe la racha al fallar
       if (!answerRecord) {
         this.state.answers.push({
           id: this.getEntryKey(entry),
@@ -1887,6 +1902,10 @@ class ImpuroStoryGame {
     this.state.playPanelIndex = 1;
     this.audio.play(option.isCorrect ? "ui.choice.correct" : "ui.choice.incorrect");
     this.flashState(option.isCorrect ? "is-score-pulse" : "is-mistake");
+    if (option.isCorrect) {
+      this.flashElement(this.refs.questionJournalCard, "is-correct");
+      this.launchConfetti();
+    }
     this.render();
   }
 
@@ -1953,6 +1972,9 @@ class ImpuroStoryGame {
     if (!this.state.alert || this.currentScreen !== GAME_STATES.FEEDBACK) {
       return;
     }
+
+    // Quitar el pulso del botón al avanzar
+    this.refs.continueBtn?.classList.remove("is-pulsing");
 
     const shouldRetry = Boolean(this.state.alert.retry);
     this.state.alert = null;
@@ -2026,6 +2048,175 @@ class ImpuroStoryGame {
     void this.refs.app.offsetWidth;
     this.refs.app.classList.add(className);
     window.setTimeout(() => this.refs.app?.classList.remove(className), 520);
+  }
+
+  // ----------------------------------------------------------------
+  // Confetti — Canvas API puro, sin dependencias
+  // ----------------------------------------------------------------
+  launchConfetti() {
+    const canvas = document.createElement("canvas");
+    canvas.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999";
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+
+    const ctx    = canvas.getContext("2d");
+    const COLORS = ["#f5c842", "#27c26b", "#e84545", "#4fc3f7", "#ff8a65", "#ce93d8", "#ffffff"];
+    const SHAPES = ["rect", "circle", "ribbon"];
+
+    // Cada partícula nace desde la mitad superior de la pantalla
+    const particles = Array.from({ length: 110 }, () => ({
+      x:     Math.random() * canvas.width,
+      y:     Math.random() * canvas.height * 0.4 - canvas.height * 0.1,
+      w:     Math.random() * 10 + 5,
+      h:     Math.random() * 6  + 3,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      shape: SHAPES[Math.floor(Math.random() * SHAPES.length)],
+      vx:    (Math.random() - 0.5) * 5,
+      vy:    Math.random() * 3 + 1.5,
+      rot:   Math.random() * Math.PI * 2,
+      rotV:  (Math.random() - 0.5) * 0.25,
+      alpha: 1,
+      decay: Math.random() * 0.008 + 0.006
+    }));
+
+    let frame;
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+
+      for (const p of particles) {
+        p.x   += p.vx;
+        p.y   += p.vy;
+        p.vy  += 0.07;           // gravedad suave
+        p.vx  *= 0.99;           // fricción del aire
+        p.rot += p.rotV;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          continue;
+        }
+        alive = true;
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+
+        if (p.shape === "circle") {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.shape === "ribbon") {
+          ctx.fillRect(-p.w / 2, -p.h / 4, p.w, p.h / 2);
+        } else {
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        }
+
+        ctx.restore();
+      }
+
+      if (alive) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        canvas.remove();
+      }
+    };
+
+    frame = requestAnimationFrame(tick);
+
+    // Límite de seguridad: limpia a los 4s pase lo que pase
+    window.setTimeout(() => {
+      cancelAnimationFrame(frame);
+      canvas.remove();
+    }, 4000);
+  }
+
+  /** Aplica una clase de animación a un elemento específico y la remueve al terminar. */
+  flashElement(element, className, duration = 600) {
+    if (!element) {
+      return;
+    }
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+    window.setTimeout(() => element.classList.remove(className), duration);
+  }
+
+  // ----------------------------------------------------------------
+  // Typewriter — escribe texto letra a letra en un contenedor
+  // Soporta múltiples párrafos en secuencia.
+  // Llama a cancelTypewriter() antes de arrancar uno nuevo.
+  // ----------------------------------------------------------------
+  cancelTypewriter() {
+    if (this._typewriterCancel) {
+      this._typewriterCancel();
+      this._typewriterCancel = null;
+    }
+  }
+
+  /**
+   * Escribe `lines` (array de strings) como párrafos <p> dentro de `container`.
+   * Cada letra aparece cada `speed` ms. Al terminar cada párrafo arranca el siguiente.
+   * @param {HTMLElement} container
+   * @param {string[]}    lines
+   * @param {number}      speed  ms por carácter (default 22)
+   */
+  typewriteLines(container, lines, speed = 22) {
+    this.cancelTypewriter();
+
+    if (!container || !lines?.length) {
+      return;
+    }
+
+    container.innerHTML = "";
+    let cancelled = false;
+    this._typewriterCancel = () => { cancelled = true; };
+
+    // Crea todos los <p> vacíos ya — el layout no salta mientras se escribe
+    const paragraphs = lines.map(() => {
+      const p = document.createElement("p");
+      container.appendChild(p);
+      return p;
+    });
+
+    const writeParagraph = (pIndex) => {
+      if (cancelled || pIndex >= paragraphs.length) {
+        return;
+      }
+
+      const p    = paragraphs[pIndex];
+      const text = lines[pIndex] ?? "";
+      let   charIndex = 0;
+
+      const tick = () => {
+        if (cancelled) {
+          // Si se cancela, rellenamos el resto del texto de golpe para no dejar a medias
+          p.textContent = text;
+          return;
+        }
+        if (charIndex < text.length) {
+          p.textContent += text[charIndex++];
+          window.setTimeout(tick, speed);
+        } else {
+          // Párrafo terminado → arranca el siguiente con una pequeña pausa
+          window.setTimeout(() => writeParagraph(pIndex + 1), speed * 4);
+        }
+      };
+
+      tick();
+    };
+
+    writeParagraph(0);
+  }
+
+  /** Activa la animación de entrada de escena en el background. */
+  animateSceneEnter() {
+    if (!this.refs.background) {
+      return;
+    }
+    this.flashElement(this.refs.background, "is-scene-enter", 700);
   }
 
   animateReveal(element) {
@@ -2292,12 +2483,20 @@ class ImpuroStoryGame {
     const progressCurrent = Math.min(this.state.answers.length + 1, this.getTotalQuestions());
     const routeText = `${entry.year || ""} | ${entry.location || ""}`;
 
-    this.refs.app?.style.setProperty("--scene-accent", entry.accent || "#c79c5c");
+    this.refs.app?.style.setProperty("--scene-accent", entry.accent || "#f5c842");
     this.refs.background.style.backgroundImage = `url("${encodeURI(entry.background || "")}")`;
+    this.animateSceneEnter();
 
     this.refs.hudAct.textContent = entry.sequenceLabel || (this.state.inFinale ? "Evaluacion" : "Ruta");
     this.refs.hudScore.textContent = String(this.state.score);
     this.refs.hudProgress.textContent = `${progressCurrent}/${this.getTotalQuestions()}`;
+    // Actualizar barra de progreso visual
+    if (this.refs.hudProgressFill) {
+      const pct = this.getTotalQuestions() > 0
+        ? Math.round((progressCurrent / this.getTotalQuestions()) * 100)
+        : 0;
+      this.refs.hudProgressFill.style.width = `${pct}%`;
+    }
     this.refs.hudPage.textContent = `${this.state.playPanelIndex + 1}/${this.getPlayPanelCount()}`;
     this.refs.playTrack.style.transform = `translateX(-${this.state.playPanelIndex * 100}%)`;
     this.refs.playPrevBtn.disabled = this.state.playPanelIndex === 0;
@@ -2314,7 +2513,10 @@ class ImpuroStoryGame {
     this.refs.storySequence.textContent = entry.sequenceLabel || "";
     this.refs.storyRoute.textContent = routeText;
     this.refs.storyTitle.textContent = entry.eventTitle || "";
-    this.refs.storyNarration.innerHTML = toParagraphs(entry.narration);
+    // Typewriter solo cuando la escena cambia; si es el mismo entry no re-escribe
+    if (this.lastRenderedEntryId !== entry.id) {
+      this.typewriteLines(this.refs.storyNarration, ensureArray(entry.narration));
+    }
     this.refs.storyContext.textContent = entry.historicalContext || "";
     this.refs.storyLink.textContent = entry.characterLink || "";
     this.refs.questionPrompt.textContent = entry.question?.prompt || "";
@@ -2323,6 +2525,7 @@ class ImpuroStoryGame {
     this.renderJournal();
     this.renderSceneArchive(entry);
     this.renderAlert();
+    this.renderStreak();
     this.renderQuestionFocus();
     this.renderMobileAccordion();
 
@@ -2444,7 +2647,46 @@ class ImpuroStoryGame {
       this.refs.alertNote.textContent = alert.whatIf.reason;
     }
     this.refs.continueBtn.textContent = alert.buttonLabel;
+    this.refs.continueBtn.classList.add("is-pulsing");
     this.refs.continueBtn.focus();
+  }
+
+  // ---------------------------------------------------------------
+  // Streak badge — muestra la racha activa en el HUD
+  // ---------------------------------------------------------------
+  renderStreak() {
+    const el = this.refs.hudStreak;
+    if (!el) {
+      return;
+    }
+
+    const streak = this.state.streak;
+
+    // Solo mostrar desde racha >= 2
+    if (streak < 2) {
+      el.hidden = true;
+      el.textContent = "";
+      return;
+    }
+
+    // Elige el emoji y mensaje según el nivel de racha
+    let emoji;
+    if      (streak >= 7) { emoji = "🌟"; }
+    else if (streak >= 5) { emoji = "⚡"; }
+    else if (streak >= 3) { emoji = "🔥"; }
+    else                   { emoji = "✨"; }
+
+    const prev = el.textContent;
+    const next = `${emoji} x${streak}`;
+
+    if (prev !== next) {
+      el.hidden = false;
+      el.textContent = next;
+      // Pequeña animación de entrada cada vez que sube
+      el.classList.remove("is-streak-pop");
+      void el.offsetWidth;
+      el.classList.add("is-streak-pop");
+    }
   }
 
   renderEnding() {
@@ -2544,6 +2786,7 @@ class ImpuroStoryGame {
   }
 
   destroy() {
+    this.cancelTypewriter();
     this.audio.stopBackground();
     this.abortController.abort();
     this.root.innerHTML = "";

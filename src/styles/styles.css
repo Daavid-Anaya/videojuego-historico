@@ -2,6 +2,13 @@
   color-scheme: dark;
 }
 
+/* =========================================================
+   FUENTES PARA NIÑOS 8-12
+   Bangers  → títulos llamativos, sabor a cómic/aventura
+   Nunito   → cuerpo de texto, redondo y muy legible
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap');
+
 *[hidden] {
   display: none !important;
 }
@@ -11,12 +18,12 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: #0f0a09;
+  background: #0d1b3e;
 }
 
 body {
-  font-family: Georgia, "Times New Roman", serif;
-  color: #f7ead3;
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  color: #f0e6d3;
 }
 
 #impuro-root,
@@ -33,25 +40,36 @@ body {
   padding: 2rem;
   text-align: center;
   background:
-    radial-gradient(circle at top, rgba(199, 156, 92, 0.16), transparent 42%),
-    linear-gradient(180deg, #1d140f 0%, #0f0a09 100%);
+    radial-gradient(circle at top, rgba(245, 200, 66, 0.18), transparent 42%),
+    linear-gradient(180deg, #1a2a5e 0%, #0d1b3e 100%);
 }
 
 .impuro-app {
-  --impuro-font-title: "Georgia", serif;
-  --impuro-ink: #f7ead3;
-  --impuro-paper: #1a120f;
-  --impuro-paper-soft: rgba(35, 24, 19, 0.88);
-  --impuro-line: rgba(248, 225, 186, 0.22);
-  --impuro-gold: #c79c5c;
-  --impuro-danger: #b6483a;
-  --impuro-success: #3f8a61;
-  --impuro-warning: #d39c41;
-  --impuro-shadow: rgba(0, 0, 0, 0.5);
-  --scene-accent: #c79c5c;
+  /* ── Tipografía ── */
+  --impuro-font-title: "Bangers", "Impact", cursive;
+  --impuro-font-body:  "Nunito", "Segoe UI", sans-serif;
+
+  /* ── Paleta base — azul noche patriótico ── */
+  --impuro-ink:        #f0e6d3;
+  --impuro-paper:      #111d42;
+  --impuro-paper-soft: rgba(17, 29, 66, 0.90);
+  --impuro-line:       rgba(240, 220, 160, 0.28);
+
+  /* ── Colores de acción ── */
+  --impuro-gold:       #f5c842;          /* dorado brillante */
+  --impuro-accent:     #e84545;          /* rojo insurgente */
+  --impuro-danger:     #e84545;
+  --impuro-success:    #27c26b;          /* verde vibrante */
+  --impuro-warning:    #f5a623;
+  --impuro-shadow:     rgba(0, 0, 0, 0.55);
+
+  /* ── Scene accent — se sobreescribe por escena ── */
+  --scene-accent:      #f5c842;
+
   width: 100%;
   height: 100dvh;
   color: var(--impuro-ink);
+  font-family: var(--impuro-font-body);
 }
 
 .impuro-sound-toggle {
@@ -99,8 +117,8 @@ body {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(130deg, rgba(16, 9, 7, 0.82), rgba(16, 9, 7, 0.5)),
-    radial-gradient(circle at 15% 20%, rgba(199, 156, 92, 0.22), transparent 30%),
+    linear-gradient(130deg, rgba(13, 27, 62, 0.84), rgba(13, 27, 62, 0.45)),
+    radial-gradient(circle at 15% 20%, rgba(245, 200, 66, 0.28), transparent 35%),
     url("../img/independencia5.jpg") center / cover no-repeat;
   transform: scale(1.03);
 }
@@ -141,8 +159,8 @@ body {
   flex-direction: column;
   justify-content: center;
   background:
-    linear-gradient(180deg, rgba(24, 15, 12, 0.94), rgba(16, 10, 8, 0.9)),
-    radial-gradient(circle at top, rgba(199, 156, 92, 0.18), transparent 38%);
+    linear-gradient(180deg, rgba(10, 18, 48, 0.96), rgba(13, 27, 62, 0.92)),
+    radial-gradient(circle at top, rgba(245, 200, 66, 0.22), transparent 42%);
 }
 
 .impuro-book-face--content {
@@ -164,10 +182,14 @@ body {
 
 .impuro-title {
   margin: 0;
-  font-size: clamp(3rem, 9vw, 5.3rem);
+  font-size: clamp(3.2rem, 9vw, 5.8rem);
   line-height: 0.95;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
+  color: var(--impuro-gold);
+  text-shadow:
+    0 0 24px rgba(245, 200, 66, 0.45),
+    2px 2px 0 rgba(0, 0, 0, 0.6);
 }
 
 .impuro-overline,
@@ -198,8 +220,9 @@ body {
 .impuro-book-face p,
 .impuro-page-card p,
 .impuro-page-card li {
-  font-size: clamp(0.92rem, 1.2vw, 1.06rem);
-  line-height: 1.45;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);   /* mínimo 1rem siempre */
+  line-height: 1.55;                          /* más espacio entre líneas para niños */
+  font-family: var(--impuro-font-body);
 }
 
 .impuro-intro-actions {
@@ -251,7 +274,7 @@ body {
   position: relative;
   z-index: 1;
   display: flex;
-  gap: 0.75rem;
+  gap: 0.65rem;
   align-items: stretch;
   flex-wrap: wrap;
   margin-bottom: 0.9rem;
@@ -261,9 +284,56 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.3rem;
-  padding: 0.7rem 0.95rem;
-  min-width: 110px;
+  gap: 0.25rem;
+  padding: 0.65rem 1rem;
+  min-width: 100px;
+  transition: transform 200ms ease;
+}
+
+/* Score chip: resaltado especial */
+.impuro-hud-chip:nth-child(2) {
+  border-color: rgba(245, 200, 66, 0.40);
+  background: rgba(245, 200, 66, 0.08);
+}
+
+/* ── Badge de racha ── */
+.impuro-hud-streak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--impuro-gold);
+  background: rgba(245, 200, 66, 0.14);
+  color: var(--impuro-gold);
+  font-family: var(--impuro-font-title);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  box-shadow: 0 0 14px rgba(245, 200, 66, 0.30);
+  cursor: default;
+}
+
+.impuro-hud-streak.is-streak-pop {
+  animation: impuroStreakPop 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Barra de progreso visual dentro del chip de progreso */
+.impuro-hud-progress-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(240, 220, 160, 0.18);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.impuro-hud-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--impuro-gold), var(--impuro-success));
+  transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 4px;
 }
 
 .impuro-hud-page-row {
@@ -286,18 +356,28 @@ body {
 }
 
 .impuro-hud-chip strong {
-  font-size: 1.85rem;
+  font-size: 1.9rem;
   line-height: 1;
   letter-spacing: 0.01em;
+  font-family: var(--impuro-font-title);  /* Bangers para los números */
+  color: var(--impuro-gold);
 }
 
 .impuro-hud-chip--action {
   cursor: pointer;
 }
 
+.impuro-hud-chip--action:hover {
+  transform: scale(1.04);
+  border-color: rgba(245, 200, 66, 0.45);
+}
+
 .impuro-hud-chip--action strong {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.1;
+  font-family: var(--impuro-font-body);
+  font-weight: 700;
+  color: var(--impuro-ink);
 }
 
 .impuro-book-shell {
@@ -600,12 +680,30 @@ body {
 .impuro-secondary-btn,
 .impuro-tab-btn {
   border-radius: 999px;
-  padding: 0.8rem 1.25rem;
+  padding: 0.9rem 1.4rem;         /* más área táctil */
   background: rgba(255, 248, 236, 0.08);
+  font-family: var(--impuro-font-body);
+  font-weight: 700;
+  font-size: 1rem;                 /* nunca menor a 1rem */
+  min-height: 48px;                /* mínimo táctil WCAG */
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.impuro-primary-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.12);
+  box-shadow: 0 6px 20px rgba(245, 200, 66, 0.35);
+}
+
+.impuro-primary-btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .impuro-primary-btn {
-  background: linear-gradient(135deg, var(--scene-accent), color-mix(in srgb, var(--scene-accent) 60%, #251813));
+  background: linear-gradient(135deg, var(--scene-accent), color-mix(in srgb, var(--scene-accent) 55%, #1a0a2e));
+  color: #0d1b3e;                  /* texto oscuro sobre dorado — mejor contraste */
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .impuro-secondary-btn,
@@ -622,13 +720,18 @@ body {
 .impuro-option-btn {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  align-items: start;
+  gap: 0.85rem;
+  align-items: center;             /* centrado vertical — más cómodo */
   width: 100%;
-  padding: 0.85rem 0.95rem;
-  border-radius: 18px;
+  padding: 1rem 1.1rem;            /* +15% de área táctil */
+  border-radius: 20px;
   text-align: left;
-  background: rgba(255, 248, 236, 0.06);
+  background: rgba(255, 248, 236, 0.07);
+  font-family: var(--impuro-font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 56px;                /* área táctil cómoda para dedos pequeños */
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .impuro-option-btn:disabled,
@@ -639,12 +742,16 @@ body {
 }
 
 .impuro-option-index {
-  width: 1.7rem;
-  height: 1.7rem;
+  width: 2rem;
+  height: 2rem;
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--scene-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--scene-accent) 80%, transparent);
+  color: #0d1b3e;
+  font-weight: 800;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 .impuro-journal-list {
@@ -712,12 +819,23 @@ body {
 }
 
 .impuro-nav-btn {
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   border-radius: 999px;
-  background: rgba(17, 11, 10, 0.82);
-  font-size: 2rem;
+  background: rgba(13, 27, 62, 0.85);
+  border-color: rgba(245, 200, 66, 0.30);
+  font-size: 2.1rem;
   line-height: 1;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.impuro-nav-btn:hover:not(:disabled) {
+  transform: scale(1.1);
+  background: rgba(245, 200, 66, 0.15);
+}
+
+.impuro-nav-btn:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .impuro-panel-dots {
@@ -733,11 +851,15 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 999px;
-  background: rgba(255, 240, 214, 0.2);
+  background: rgba(240, 220, 160, 0.22);
+  transition: width 250ms ease, background 250ms ease, transform 250ms ease;
 }
 
 .impuro-dot.is-active {
+  width: 28px;                     /* dot activo se alarga — pill shape */
   background: var(--scene-accent);
+  transform: scaleY(1.15);
+  box-shadow: 0 0 8px rgba(245, 200, 66, 0.45);
 }
 
 .impuro-modal {
@@ -922,48 +1044,136 @@ body {
   background: color-mix(in srgb, var(--scene-accent) 34%, rgba(255, 248, 236, 0.08));
 }
 
+/* =================================================================
+   ANIMACIONES — optimizadas para feedback emocional (niños 8-12)
+   ================================================================= */
+
+/* ── Entrada de pantalla / panel ── */
 .is-revealing {
-  animation: impuroReveal 420ms ease;
+  animation: impuroReveal 380ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ── Escena nueva: zoom suave desde el fondo ── */
+.impuro-scene-background.is-scene-enter {
+  animation: impuroSceneEnter 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Respuesta CORRECTA: card se ilumina y expande ── */
+.is-correct .impuro-page-card--question-journal {
+  animation: impuroCorrectBurst 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Respuesta INCORRECTA: shake dramático + flash rojo ── */
+.is-mistake .impuro-page-card--question-journal {
+  animation: impuroWrongFlash 480ms ease;
+}
+
+/* ── Score sube: el chip del puntaje "salta" ── */
 .is-score-pulse .impuro-hud-chip:nth-child(2) {
-  animation: impuroPulseSuccess 360ms ease;
+  animation: impuroScorePop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.is-mistake .impuro-page-card--question {
-  animation: impuroShake 320ms ease;
+/* ── Botón de continuar: pulsa para llamar la atención ── */
+.impuro-primary-btn.is-pulsing {
+  animation: impuroCtaPulse 1.2s ease infinite;
 }
+
+/* ── Partículas del fondo: flotan lentamente ── */
+.impuro-particles {
+  animation: impuroParticleFloat 8s ease-in-out infinite;
+}
+
+/* ── Alert card: entra desde abajo con rebote ── */
+.impuro-alert-card {
+  animation: impuroAlertEnter 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Backdrop del intro: lento zoom cinematográfico ── */
+.impuro-intro-backdrop {
+  animation: impuroBackdropBreath 18s ease-in-out infinite alternate;
+}
+
+/* ── Option btn hover — lift con brillo dorado ── */
+.impuro-option-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  border-color: var(--impuro-gold);
+  box-shadow: 0 8px 24px rgba(245, 200, 66, 0.28);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+/* ── Option btn focus visible — accesibilidad ── */
+.impuro-option-btn.is-focused,
+.impuro-option-btn:focus-visible {
+  outline: 3px solid var(--impuro-gold);
+  outline-offset: 2px;
+  transform: translateY(-2px);
+}
+
+/* =================================================================
+   KEYFRAMES
+   ================================================================= */
 
 @keyframes impuroReveal {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes impuroPulseSuccess {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.04);
-  }
+@keyframes impuroSceneEnter {
+  from { opacity: 0; transform: scale(1.06); filter: blur(6px) brightness(0.6); }
+  to   { opacity: 1; transform: scale(1.05); filter: blur(0)   brightness(0.34); }
 }
 
-@keyframes impuroShake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  30% {
-    transform: translateX(-5px);
-  }
-  70% {
-    transform: translateX(5px);
-  }
+@keyframes impuroCorrectBurst {
+  0%   { transform: scale(1);    border-color: rgba(240, 220, 160, 0.22); box-shadow: none; }
+  35%  { transform: scale(1.03); border-color: var(--impuro-success);     box-shadow: 0 0 0 6px  rgba(39, 194, 107, 0.25); }
+  65%  { transform: scale(1.015);border-color: var(--impuro-success);     box-shadow: 0 0 0 12px rgba(39, 194, 107, 0.10); }
+  100% { transform: scale(1);    border-color: rgba(39, 194, 107, 0.45);  box-shadow: none; }
+}
+
+@keyframes impuroWrongFlash {
+  0%   { transform: translateX(0);   filter: brightness(1); }
+  12%  { transform: translateX(-9px); filter: brightness(1.5) hue-rotate(-15deg); }
+  28%  { transform: translateX(9px);  filter: brightness(1.3); }
+  44%  { transform: translateX(-6px); filter: brightness(1.2); }
+  60%  { transform: translateX(6px);  filter: brightness(1.1); }
+  76%  { transform: translateX(-3px); filter: brightness(1); }
+  100% { transform: translateX(0);   filter: brightness(1); }
+}
+
+@keyframes impuroScorePop {
+  0%   { transform: scale(1)    rotate(0deg);  color: var(--impuro-ink); }
+  35%  { transform: scale(1.55) rotate(-4deg); color: var(--impuro-gold); text-shadow: 0 0 12px rgba(245, 200, 66, 0.6); }
+  65%  { transform: scale(1.25) rotate(3deg);  color: var(--impuro-gold); }
+  100% { transform: scale(1)    rotate(0deg);  color: var(--impuro-ink); }
+}
+
+@keyframes impuroCtaPulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(245, 200, 66, 0.5); }
+  50%       { box-shadow: 0 0 0 10px rgba(245, 200, 66, 0); }
+}
+
+@keyframes impuroParticleFloat {
+  0%   { transform: translateY(0)    rotate(0deg);   opacity: 0.6; }
+  33%  { transform: translateY(-14px) rotate(120deg); opacity: 0.9; }
+  66%  { transform: translateY(-7px)  rotate(240deg); opacity: 0.5; }
+  100% { transform: translateY(0)    rotate(360deg); opacity: 0.6; }
+}
+
+@keyframes impuroAlertEnter {
+  from { opacity: 0; transform: translateY(28px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes impuroBackdropBreath {
+  from { transform: scale(1.03); }
+  to   { transform: scale(1.08); }
+}
+
+@keyframes impuroStreakPop {
+  0%   { transform: scale(1)    rotate(0deg);  }
+  30%  { transform: scale(1.45) rotate(-6deg); box-shadow: 0 0 22px rgba(245, 200, 66, 0.65); }
+  60%  { transform: scale(1.20) rotate(4deg);  }
+  100% { transform: scale(1)    rotate(0deg);  }
 }
 
 @media (max-width: 960px) {
