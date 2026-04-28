@@ -1,8 +1,7 @@
 const DEFAULT_CONFIG_PATH = "src/data/game-config.json";
 
 const RUNTIME = Object.freeze({
-  STANDALONE: "standalone",
-  TWINE: "twine"
+  STANDALONE: "standalone"
 });
 
 const GAME_STATES = Object.freeze({
@@ -738,7 +737,7 @@ class ImpuroStoryGame {
   constructor(root, options = {}) {
     this.root = root;
     this.config = cloneData(options.config || {});
-    this.runtime = options.runtime || RUNTIME.TWINE;
+    this.runtime = options.runtime || RUNTIME.STANDALONE;
     this.onFinish = typeof options.onFinish === "function" ? options.onFinish : null;
     this.abortController = new AbortController();
     this.audio = new SynthAudioManager(this.config.sounds || {});
@@ -2842,7 +2841,7 @@ async function mount(root, options = {}) {
 
   try {
     const config = await loadConfig(options);
-    const runtime = options.runtime || (document.body?.classList.contains("impuro-host--standalone") ? RUNTIME.STANDALONE : RUNTIME.TWINE);
+    const runtime = options.runtime || RUNTIME.STANDALONE;
     const game = new ImpuroStoryGame(root, { ...options, config, runtime });
     ACTIVE_GAMES.set(root, game);
     CURRENT_ROOT = root;

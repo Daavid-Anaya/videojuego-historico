@@ -18,7 +18,6 @@ El cierre final tambien usa tres paneles:
 - `src/scripts/app.js`: logica, maquina de estados, navegacion lateral, feedback y cierre.
 - `src/styles/styles.css`: layout horizontal, responsividad y animaciones.
 - `src/data/game-config.json`: contenido historico, perfiles de personajes y referencias.
-- `twine/`: integracion para SugarCube.
 
 ## Maquina de estados
 

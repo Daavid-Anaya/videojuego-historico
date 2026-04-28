@@ -43,11 +43,6 @@ logs/
 .env.*
 !.env.example
 
-# ─── Twine ────────────────────────────────────────────
-# Archivos de backup de Twine
-*.tw.bak
-*.twee.bak
-
 # ─── Temporales ───────────────────────────────────────
 *.tmp
 *.temp
